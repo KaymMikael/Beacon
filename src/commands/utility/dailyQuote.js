@@ -8,6 +8,7 @@ module.exports = {
     .setDescription("Get the quote of the day."),
   async execute(interaction) {
     try {
+      await interaction.deferReply({ flags: MessageFlags.Ephemeral });
       const response = await fetch("https://zenquotes.io/api/today");
       if (!response.ok) {
         console.log("Not Ok");
@@ -20,13 +21,13 @@ module.exports = {
         .setTitle("Quote of the Day")
         .setDescription(`**"${quote}**" - *${author}*`);
       interaction.channel.send({ embeds: [quoteEmbed] });
-      await interaction.reply({
+      await interaction.editReply({
         content: "Showed the quote of the day",
         flags: MessageFlags.Ephemeral,
       });
     } catch (error) {
       console.log(error);
-      await interaction.reply({
+      await interaction.editReply({
         content: "An error occurred while getting a quote",
         flags: MessageFlags.Ephemeral,
       });
