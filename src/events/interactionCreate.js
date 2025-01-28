@@ -1,8 +1,22 @@
 const { Events, MessageFlags } = require("discord.js");
 
+const allowedChannelIds = [
+  process.env.COMMANDS_CHANNEL_ID,
+  process.env.DAILY_QUOTES_CHANNEL_ID,
+];
+
 // Function to Handle Command Execution
 async function handleCommandInteraction(interaction) {
   if (!interaction.isChatInputCommand()) return;
+
+  // Ensure that the channel id from interaction is allowed
+  if (!allowedChannelIds.includes(interaction.channelId)) {
+    await interaction.reply({
+      content: "You can only use commands in specific channels.",
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
 
   const command = interaction.client.commands.get(interaction.commandName);
 
