@@ -34,40 +34,20 @@ function loadCommands() {
   }
 }
 
-// Function to Handle Command Execution
-async function handleCommandInteraction(interaction) {
-  if (!interaction.isChatInputCommand()) return;
+const EVENTS_PATH = path.join(__dirname, "events");
+const eventFiles = fs
+  .readdirSync(EVENTS_PATH)
+  .filter((file) => file.endsWith(".js"));
 
-  const command = client.commands.get(interaction.commandName);
-
-  if (!command) {
-    console.error(`No command matching ${interaction.commandName} was found.`);
-    return;
-  }
-
-  try {
-    await command.execute(interaction);
-  } catch (error) {
-    console.error(`Error executing command ${interaction.commandName}:`, error);
-
-    const response = {
-      content: "There was an error while executing this command!",
-      ephemeral: true,
-    };
-
-    if (interaction.replied || interaction.deferred) {
-      await interaction.followUp(response);
-    } else {
-      await interaction.reply(response);
-    }
+for (const file of eventFiles) {
+  const filePath = path.join(EVENTS_PATH, file);
+  const event = require(filePath);
+  if (event.once) {
+    client.once(event.name, (...args) => event.execute(...args));
+  } else {
+    client.on(event.name, (...args) => event.execute(...args));
   }
 }
-
-client.once(Events.ClientReady, (readyClient) => {
-  console.log(`${readyClient.user.tag} is ready`);
-});
-
-client.on(Events.InteractionCreate, handleCommandInteraction);
 
 loadCommands();
 
