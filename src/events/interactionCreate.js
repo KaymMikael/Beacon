@@ -1,9 +1,6 @@
 const { Events, MessageFlags, Collection } = require("discord.js");
 
-const allowedChannelIds = [
-  process.env.COMMANDS_CHANNEL_ID,
-  process.env.QUOTES_CHANNEL_ID,
-];
+const allowedChannelIds = [process.env.COMMANDS_CHANNEL_ID];
 
 // Function to Handle Command Execution
 async function handleCommandInteraction(interaction) {
@@ -14,19 +11,6 @@ async function handleCommandInteraction(interaction) {
     await interaction.reply({
       content: "You can only use commands in specific channels.",
       ephemeral: true,
-    });
-    return;
-  }
-
-  // Ensure the the quote command can only be used in #quotes channel
-  if (
-    (interaction.commandName === "daily-quote" ||
-      interaction.commandName === "quote") &&
-    interaction.channelId !== process.env.QUOTES_CHANNEL_ID
-  ) {
-    await interaction.reply({
-      content: "The quote command can only be used in #quotes channel.",
-      flags: MessageFlags.Ephemeral,
     });
     return;
   }
