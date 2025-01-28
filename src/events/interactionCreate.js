@@ -1,22 +1,18 @@
-const { Events, MessageFlags, Collection } = require("discord.js");
+const { Events, Collection, MessageFlags } = require("discord.js");
 
 const allowedChannelIds = [process.env.COMMANDS_CHANNEL_ID];
 
-// Function to Handle Command Execution
-async function handleCommandInteraction(interaction) {
-  if (!interaction.isChatInputCommand()) return;
+// Check if the command is allowed in the current channel
+const isAllowedChannel = (channelId) => allowedChannelIds.includes(channelId);
 
-  // Ensure that the channel id from interaction is allowed
-  if (!allowedChannelIds.includes(interaction.channelId)) {
-    await interaction.reply({
-      content: "You can only use commands in specific channels.",
-      ephemeral: true,
-    });
-    return;
-  }
-
-  const command = interaction.client.commands.get(interaction.commandName);
-
+/**
+ * this function is used to handle cooldown
+ *
+ * returns true if the user is not on cooldown
+ *
+ * returns false if the user is on cooldown
+ */
+const handleCooldowns = (interaction, command) => {
   const { cooldowns } = interaction.client;
 
   if (!cooldowns.has(command.data.name)) {
@@ -25,7 +21,7 @@ async function handleCommandInteraction(interaction) {
 
   const now = Date.now();
   const timestamps = cooldowns.get(command.data.name);
-  const defaultCooldownDuration = 3;
+  const defaultCooldownDuration = 3; // Default cooldown duration in seconds
   const cooldownAmount = (command.cooldown ?? defaultCooldownDuration) * 1_000;
 
   if (timestamps.has(interaction.user.id)) {
@@ -33,21 +29,21 @@ async function handleCommandInteraction(interaction) {
 
     if (now < expirationTime) {
       const expiredTimestamp = Math.round(expirationTime / 1_000);
-      return interaction.reply({
+      interaction.reply({
         content: `Please wait, you are on a cooldown for \`${command.data.name}\`. You can use it again <t:${expiredTimestamp}:R>.`,
         flags: MessageFlags.Ephemeral,
       });
+      return false;
     }
   }
 
   timestamps.set(interaction.user.id, now);
   setTimeout(() => timestamps.delete(interaction.user.id), cooldownAmount);
+  return true;
+};
 
-  if (!command) {
-    console.error(`No command matching ${interaction.commandName} was found.`);
-    return;
-  }
-
+// Execute the command
+const executeCommand = async (interaction, command) => {
   try {
     await command.execute(interaction);
   } catch (error) {
@@ -55,15 +51,41 @@ async function handleCommandInteraction(interaction) {
     if (interaction.replied || interaction.deferred) {
       await interaction.followUp({
         content: "There was an error while executing this command!",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     } else {
       await interaction.reply({
         content: "There was an error while executing this command!",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
   }
+};
+
+// Main function to handle command interaction
+async function handleCommandInteraction(interaction) {
+  if (!interaction.isChatInputCommand()) return;
+
+  if (!isAllowedChannel(interaction.channelId)) {
+    await interaction.reply({
+      content: "You can only use commands in specific channels.",
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
+
+  const command = interaction.client.commands.get(interaction.commandName);
+
+  if (!command) {
+    console.error(`No command matching ${interaction.commandName} was found.`);
+    return;
+  }
+
+  if (!handleCooldowns(interaction, command)) {
+    return;
+  }
+
+  await executeCommand(interaction, command);
 }
 
 module.exports = {
