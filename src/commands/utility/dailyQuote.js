@@ -18,7 +18,7 @@ module.exports = {
       const quoteEmbed = new EmbedBuilder()
         .setColor(0x0099ff)
         .setTitle("Quote of the Day")
-        .setDescription(`${quote} - ${author}`);
+        .setDescription(`**"${quote}**" - *${author}*`);
       interaction.channel.send({ embeds: [quoteEmbed] });
       await interaction.reply({
         content: "Showed the quote of the day",
@@ -26,6 +26,10 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
+      await interaction.reply({
+        content: "An error occurred while getting a quote",
+        flags: MessageFlags.Ephemeral,
+      });
     }
   },
 };
