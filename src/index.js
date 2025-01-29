@@ -9,6 +9,7 @@ client.commands = new Collection();
 client.cooldowns = new Collection();
 
 const COMMANDS_PATH = path.join(__dirname, "commands");
+const EVENTS_PATH = path.join(__dirname, "events");
 
 // Function to Load Commands
 function loadCommands() {
@@ -33,20 +34,19 @@ function loadCommands() {
       }
     }
   }
-}
 
-const EVENTS_PATH = path.join(__dirname, "events");
-const eventFiles = fs
-  .readdirSync(EVENTS_PATH)
-  .filter((file) => file.endsWith(".js"));
+  const eventFiles = fs
+    .readdirSync(EVENTS_PATH)
+    .filter((file) => file.endsWith(".js"));
 
-for (const file of eventFiles) {
-  const filePath = path.join(EVENTS_PATH, file);
-  const event = require(filePath);
-  if (event.once) {
-    client.once(event.name, (...args) => event.execute(...args));
-  } else {
-    client.on(event.name, (...args) => event.execute(...args));
+  for (const file of eventFiles) {
+    const filePath = path.join(EVENTS_PATH, file);
+    const event = require(filePath);
+    if (event.once) {
+      client.once(event.name, (...args) => event.execute(...args));
+    } else {
+      client.on(event.name, (...args) => event.execute(...args));
+    }
   }
 }
 
