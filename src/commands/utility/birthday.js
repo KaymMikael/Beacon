@@ -36,8 +36,8 @@ module.exports = {
       return;
     }
 
-    // Convert the date to ISO format.
-    const isoDate = new Date(date).toISOString();
+    // Convert the input date to date object
+    const dateBirthdayObj = new Date(date);
 
     try {
       // Check if the user has already set a birthday.
@@ -52,7 +52,7 @@ module.exports = {
       }
 
       // Add the user's birthday to the database.
-      await addBirthday(userId, isoDate);
+      await addBirthday(userId, dateBirthdayObj);
 
       // Confirm to the user that their birthday has been set.
       await interaction.editReply({
