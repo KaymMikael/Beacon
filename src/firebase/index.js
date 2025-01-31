@@ -13,7 +13,7 @@ const db = admin.firestore();
 async function addBirthday(userId, birthdayDate) {
   const month = birthdayDate.getMonth() + 1;
   const day = birthdayDate.getDate();
-  await db.collection("birthdays").doc(userId).set({ month, day });
+  await db.collection("birthdays").doc(userId).set({ month, day, userId });
 }
 
 // this function gets the user birthday based on userId
