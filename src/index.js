@@ -2,19 +2,22 @@ require("dotenv/config");
 const fs = require("fs");
 const path = require("path");
 const { Client, GatewayIntentBits, Collection } = require("discord.js");
+const schedule = require("node-schedule");
+const { scheduleBirthday } = require("./model/Birthday");
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers],
+});
 
 client.commands = new Collection();
 client.cooldowns = new Collection();
 
-const COMMANDS_PATH = path.join(__dirname, "commands");
-const EVENTS_PATH = path.join(__dirname, "events");
-
 // Function to Load Commands
-function loadCommands() {
-  const commandFolders = fs.readdirSync(COMMANDS_PATH);
+function loadCommandsAndEvents() {
+  const COMMANDS_PATH = path.join(__dirname, "commands");
+  const EVENTS_PATH = path.join(__dirname, "events");
 
+  const commandFolders = fs.readdirSync(COMMANDS_PATH);
   for (const folder of commandFolders) {
     const folderPath = path.join(COMMANDS_PATH, folder);
     const commandFiles = fs
@@ -38,7 +41,6 @@ function loadCommands() {
   const eventFiles = fs
     .readdirSync(EVENTS_PATH)
     .filter((file) => file.endsWith(".js"));
-
   for (const file of eventFiles) {
     const filePath = path.join(EVENTS_PATH, file);
     const event = require(filePath);
@@ -50,6 +52,8 @@ function loadCommands() {
   }
 }
 
-loadCommands();
+loadCommandsAndEvents();
+
+schedule.scheduleJob("0 0 * * *", () => scheduleBirthday(client));
 
 client.login(process.env.DISCORD_BOT_TOKEN);
