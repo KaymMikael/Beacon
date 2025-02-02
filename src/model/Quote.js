@@ -37,8 +37,12 @@ class Quote {
         .setTitle("Quote of the Day")
         .setDescription(`**"${quote}**" - *${author}*`);
 
+      const channel = this.#interaction.guild.channels.cache.get(
+        process.env.QUOTE_CHANNEL_ID
+      );
+
       // Send the embedded message to the channel.
-      this.#interaction.channel.send({ embeds: [quoteEmbed] });
+      channel.send({ embeds: [quoteEmbed] });
 
       // Edit the original reply to inform the user that the quote was shown.
       await this.#interaction.editReply({
@@ -77,7 +81,10 @@ class Quote {
         .setDescription(`**"${quote}**" - *${author}*`);
 
       // Send the embedded message to the channel.
-      this.#interaction.channel.send({ embeds: [quoteEmbed] });
+      const channel = this.#interaction.guild.channels.cache.get(
+        process.env.QUOTE_CHANNEL_ID
+      );
+      channel.send({ embeds: [quoteEmbed] });
 
       // Edit the original reply to inform the user that the quote was shown.
       await this.#interaction.editReply({
