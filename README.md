@@ -8,7 +8,7 @@ Community Helper Bot is a Discord bot designed to automate engagement in your se
 - 🔀 **Random Quotes**: Get an instant boost of motivation with a random quote.
 - 📊 **Skill Polls**: Engage your community with interactive polls.
 - 📡 **Server Info & User Details**: Retrieve server statistics and user information.
-- 🏓 **Ping Command**: Check the bot's latency.
+- 🏓 **Ping Command**: Bot replies "pong".
 
 ## Commands
 | Command | Description |
@@ -16,7 +16,7 @@ Community Helper Bot is a Discord bot designed to automate engagement in your se
 | `/birthday` | Displays upcoming birthdays in the server. |
 | `/quote random` | Sends a randomly selected motivational quote. |
 | `/quote daily` | Sends the daily motivational quote. |
-| `/ping` | Checks the bot's latency. |
+| `/ping` | Replies with "pong". |
 | `/user` | Retrieves information about a user. |
 | `/server` | Provides details about the server. |
 | `/poll choices` | Creates a skill poll with custom choices. |
