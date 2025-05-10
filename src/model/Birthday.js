@@ -24,7 +24,7 @@ async function scheduleBirthday(client) {
   try {
     const snapshot = await getUsersBirthday();
 
-    if (!snapshot.length) {
+    if (snapshot.empty) {
       console.log("No birthdays found.");
       return;
     }
